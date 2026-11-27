@@ -22,6 +22,7 @@ use Grav\Plugin\Pagination\PaginationHelper;
 final class Seo
 {
     private const DESCRIPTION_LENGTH = 155;
+    private const TITLE_LENGTH = 60;
     private const HEADLINE_LENGTH = 110;
     private const SOCIAL = [1200, 630];
     /** Aspect ratios Google recommends for article images. */
@@ -105,7 +106,12 @@ final class Seo
             }
         }
         $suffix = mb_strtolower($base) === mb_strtolower($siteName) ? ($tagline !== $siteName ? $tagline : '') : $siteName;
-        $title = $base . ($context ? ' – ' . implode(', ', $context) : '') . ($suffix !== '' ? ' | ' . $suffix : '');
+        $title = $base . ($context ? ' – ' . implode(', ', $context) : '');
+        // The site name is added only while the whole title fits search results (about 60
+        // characters); Google shows the site name separately anyway (WebSite data, og:site_name).
+        if ($suffix !== '' && mb_strlen($title . ' | ' . $suffix) <= self::TITLE_LENGTH) {
+            $title .= ' | ' . $suffix;
+        }
         $socialTitle = $base . ($context ? ' – ' . implode(', ', $context) : '');
 
         $description = $this->description($page, $seo, $aura, $metadata, $article, $category);

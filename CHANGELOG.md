@@ -3,6 +3,11 @@
 Versions follow [semantic versioning](https://semver.org): 2.0.x for fixes and small changes,
 2.x.0 for new features, a new major version only when sites must change their setup.
 
+## Unreleased
+
+- The site name is added to a page title only while the whole title fits search results
+  (60 characters); Google shows the site name separately.
+
 ## 2.0.0 – 2026-11-27
 
 First public release of Denuo2, the second generation of the Denuo theme for Grav.
