@@ -1,0 +1,8 @@
+{% set grid_size = theme_var('grid-size') %}
+{% set image = page.media.images|first %}
+
+<section class="section modular-text {{ page.header.class}}">
+    <section class="d2-wrap">
+{{ content|markdown|raw }}
+    </section>
+</section>

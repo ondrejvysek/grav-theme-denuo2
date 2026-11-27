@@ -1,0 +1,17 @@
+{% extends 'partials/base.html.twig' %}
+
+{% block content %}
+    {# On Home the theme's hero (texts from the home page's hero: front matter) replaces a _hero module. #}
+    {% set theme_hero = page.home and theme_var('home.hero.enabled') %}
+    {% if theme_hero %}
+        {% include 'partials/home-hero.html.twig' %}
+    {% endif %}
+
+    {{ page.content|raw }}
+
+    {% for module in page.collection() %}
+        {% if not (theme_hero and module.folder == '_hero') %}
+            {{ module.content|raw }}
+        {% endif %}
+    {% endfor %}
+{% endblock %}

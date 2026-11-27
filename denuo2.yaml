@@ -1,0 +1,76 @@
+# Theme defaults. Site-specific values (texts, links, logo, analytics) belong in
+# user/config/themes/denuo2.yaml, which Grav merges over this file and Admin writes to.
+enabled: true
+color_mode: light
+mode_switcher: false
+colors:
+  light:
+    bg_start: '#E3EAFF'
+    bg_middle: '#F2ECFA'
+    bg_end: '#E8F2FB'
+    surface: '#FFFFFF'
+    text: '#2B2D45'
+    primary: '#5B3FD9'
+    accent: '#D6E4FF'
+  dark:
+    bg_start: '#08111F'
+    bg_middle: '#0C1A2E'
+    bg_end: '#0A1526'
+    surface: '#112139'
+    text: '#E3ECF8'
+    primary: '#5AB0FF'
+    accent: '#1B3354'
+  sunset:
+    bg_start: '#24182A'
+    bg_middle: '#3B2034'
+    bg_end: '#4A2630'
+    surface: '#33213A'
+    text: '#FCEAE2'
+    primary: '#FF9A66'
+    accent: '#5A2F45'
+brand:
+  name: ''
+  logo: ''
+  touch_icon: ''
+  publisher_logo: ''
+  fallback_image: ''
+  font_heading: manrope
+  font_body: open-sans
+copy_startyear: ''
+copy_company: ''
+category_title_pattern: ''
+category_chip_exclude: []
+privacy:
+  ga4_id: ''
+  consent_enabled: true
+  # Empty texts use the theme translations (languages.yaml, THEME_DENUO2.CONSENT).
+  title: ''
+  message: ''
+  accept_label: ''
+  reject_label: ''
+  settings_label: ''
+  policy_url: ''
+home:
+  hero:
+    enabled: true
+    tag: ''
+    title: ''
+    lead: ''
+    primary: { label: '', url: '#clanky' }
+    secondary: { label: '', url: '' }
+    image: ''
+    image_alt: ''
+  topics: true
+  latest_count: 6
+seo:
+  site_name: ''
+  publisher_type: organization
+  publisher_name: ''
+  same_as: []
+  x_handle: ''
+  large_image_preview: true
+# Public author profiles, matched on the article's `author` front matter.
+authors: []
+footer:
+  tagline: ''
+  columns: []

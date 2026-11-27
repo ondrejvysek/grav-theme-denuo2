@@ -1,0 +1,2 @@
+{% set brand = brand|default(denuo_brand()) %}
+{% if brand.logo %}<img src="{{ brand.logo }}" width="{{ size }}" height="{{ size }}" alt="{{ label|default('') }}">{% endif %}

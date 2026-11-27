@@ -1,0 +1,19 @@
+{#
+    hreflang alternates for search engines, from the langswitcher plugin's data. Same as the
+    plugin's own partial, but without the doubled page extension (.html.html) its routes produce
+    when Grav appends an URL extension.
+#}
+{% set ext = page.urlExtension %}
+{% for language in langswitcher.languages %}
+    {% if langswitcher.translated_routes[language] %}
+        {% set lang_url = langswitcher.translated_routes[language] %}
+        {% if not (ext and lang_url ends with ext) %}{% set lang_url = lang_url ~ ext %}{% endif %}
+    {% else %}
+        {% set lang_url = base_url_simple ~ grav.language.getLanguageURLPrefix(language) ~ langswitcher.page_route ~ ext %}
+    {% endif %}
+    {% set href_url = uri.base ~ lang_url ~ uri.params ~ (uri.query|length > 1 ? '?' ~ uri.query) %}
+    {% if grav.language.default == language and not config.system.languages.include_default_lang %}
+        <link rel="alternate" hreflang="x-default" href="{{ href_url }}">
+    {% endif %}
+    <link rel="alternate" hreflang="{{ language }}" href="{{ href_url }}">
+{% endfor %}

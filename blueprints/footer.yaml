@@ -1,0 +1,44 @@
+title: 'Footer content'
+'@extends':
+    type: default
+    context: blueprints://pages
+
+form:
+  fields:
+    tabs:
+      fields:
+        footer:
+          type: tab
+          title: Footer
+          fields:
+            footer_intro:
+              type: display
+              size: large
+              markdown: true
+              content: 'Texts and links of the site footer. Keep this page in the folder `_footer` (never shown on its own); each language version has its own footer.'
+            header.footer.tagline:
+              type: text
+              label: Text under the logo
+              size: long
+            header.footer.columns:
+              type: list
+              label: Link columns
+              help: 'A column without links is not shown.'
+              style: vertical
+              collapsed: true
+              fields:
+                .title:
+                  type: text
+                  label: Column heading
+                .links:
+                  type: list
+                  label: Links
+                  style: vertical
+                  fields:
+                    .label:
+                      type: text
+                      label: Link text
+                    .url:
+                      type: text
+                      label: Link
+                      help: 'A page route such as /blog (resolved to the page URL) or a full https:// address.'

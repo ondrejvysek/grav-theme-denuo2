@@ -1,0 +1,121 @@
+{#
+    Main navigation without Bootstrap: the same menu renders inline on desktop (pill) and in a
+    native <dialog> drawer below 992px. Submenus are a button with aria-expanded and a list
+    toggled by js/site.js.
+#}
+{% macro menu(items, prefix) %}
+    {% set chevron %}<svg class="d2-nav-chevron" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2 3.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>{% endset %}
+    <ul class="d2-nav-list">
+        {% for item in items %}
+            {% set active = item.active or item.activeChild %}
+            {% set children = item.children.visible %}
+            {% set submenu_id = prefix ~ '-sub-' ~ loop.index %}
+            <li class="d2-nav-item{{ active ? ' is-active' }}{{ children|length ? ' has-children' }}">
+                {% if item.routable %}
+                    <a class="d2-nav-link" href="{{ item.url }}"{% if item.active %} aria-current="page"{% endif %}>{{ item.menu }}</a>
+                {% endif %}
+                {% if children|length %}
+                    <button type="button" class="d2-nav-toggle" data-submenu-toggle aria-expanded="false" aria-controls="{{ submenu_id }}"
+                            {% if item.routable %}aria-label="{{ 'THEME_DENUO2.NAV.SUBMENU'|t(item.menu) }}"{% endif %}>
+                        {% if not item.routable %}{{ item.menu }}{% endif %}{{ chevron }}
+                    </button>
+                    <ul class="d2-submenu" id="{{ submenu_id }}" hidden>
+                        {% for child in children %}
+                            <li>
+                                {% if child.routable %}
+                                    <a class="d2-submenu-link" href="{{ child.url }}"{% if child.active %} aria-current="page"{% endif %}>{{ child.menu }}</a>
+                                {% else %}
+                                    <span class="d2-submenu-heading">{{ child.menu }}</span>
+                                {% endif %}
+                                {% if child.children.visible|length %}
+                                    <ul class="d2-nav-subtree">
+                                        {% for grandchild in child.children.visible %}
+                                            {% if grandchild.routable %}
+                                                <li><a class="d2-submenu-link" href="{{ grandchild.url }}"{% if grandchild.active %} aria-current="page"{% endif %}>{{ grandchild.menu }}</a></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+{% import _self as nav %}
+{# Language pill: only with the langswitcher plugin enabled and more than one site language. #}
+{% set show_languages = config.plugins.langswitcher.enabled|default(false) and langswitcher is defined and langswitcher.languages|length > 1 %}
+
+<header class="d2-header" id="home">
+    <nav class="d2-wrap d2-nav" aria-label="{{ 'THEME_DENUO2.NAV.MAIN'|t }}">
+        {% set brand = denuo_brand() %}
+        <a class="d2-brand" href="{{ url('/') }}" aria-label="{{ 'THEME_DENUO2.NAV.HOME'|t(brand.name) }}">
+            {% include 'partials/brand-mark.html.twig' with {size: 32} %}
+            <span translate="no">{{ brand.name }}</span>
+        </a>
+
+        <div class="d2-nav-desktop">
+            {{ nav.menu(pages.children.visible, 'menu') }}
+        </div>
+
+        <div class="d2-nav-actions">
+            {% if show_languages %}
+                {% include 'partials/lang-switcher.html.twig' with {variant: 'header'} %}
+            {% endif %}
+            {% if tokens.switcher|default(false) %}
+                {# Narrow desktops (992–1199px): one button that cycles light → sunset → dark.
+                   From 1200px the full switcher; on phones it lives in the drawer. #}
+                {% set mode_names = {light: 'THEME_DENUO2.MODE.LIGHT'|t, sunset: 'THEME_DENUO2.MODE.SUNSET'|t, dark: 'THEME_DENUO2.MODE.DARK'|t} %}
+                <button type="button" class="d2-nav-control d2-mode-cycle" data-mode-cycle
+                        aria-label="{{ 'THEME_DENUO2.MODE.CURRENT'|t(mode_names[tokens.mode]|default('THEME_DENUO2.MODE.AUTO'|t)) }}">
+                    {% for value in ['light', 'sunset', 'dark'] %}
+                        {% include 'partials/mode-icon.html.twig' with {value: value, extra_class: 'd2-mode-cycle-' ~ value} only %}
+                    {% endfor %}
+                </button>
+                {% include 'partials/mode-switcher.html.twig' with {id: 'mode-header', variant: 'header'} %}
+            {% endif %}
+            {% if config.plugins.simplesearch.enabled %}
+                {% include 'partials/searchicon.html.twig' %}
+            {% endif %}
+            <button type="button" class="d2-nav-control d2-menu-trigger" id="site-drawer-trigger"
+                    aria-haspopup="dialog" aria-controls="site-drawer" aria-expanded="false" aria-label="{{ 'THEME_DENUO2.NAV.OPEN'|t }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false">
+                    <path d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+    </nav>
+    <div class="pageprogress" role="progressbar" aria-label="{{ 'THEME_DENUO2.NAV.PROGRESS'|t }}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+</header>
+
+<dialog class="d2-drawer" id="site-drawer" aria-labelledby="site-drawer-title">
+    <div class="d2-dialog-head">
+        <h2 class="d2-dialog-title" id="site-drawer-title">{{ 'THEME_DENUO2.NAV.MENU'|t }}</h2>
+        <form method="dialog">
+            <button type="submit" class="d2-btn d2-btn--ghost d2-btn--icon" aria-label="{{ 'THEME_DENUO2.NAV.CLOSE'|t }}">{% include 'partials/close-icon.html.twig' %}</button>
+        </form>
+    </div>
+    <nav class="d2-nav-drawer" aria-label="{{ 'THEME_DENUO2.NAV.MAIN'|t }}">
+        {{ nav.menu(pages.children.visible, 'drawer') }}
+    </nav>
+    {% if show_languages %}
+        <nav class="d2-drawer-lang" aria-labelledby="drawer-lang-title">
+            <span class="d2-eyebrow" id="drawer-lang-title">{{ 'THEME_DENUO2.NAV.LANGUAGE'|t }}</span>
+            {% include 'partials/lang-switcher.html.twig' with {variant: 'drawer'} %}
+        </nav>
+    {% endif %}
+    {% if tokens.switcher|default(false) %}
+        <div class="d2-drawer-mode">
+            <span class="d2-eyebrow" aria-hidden="true">{{ 'THEME_DENUO2.MODE.LABEL'|t }}</span>
+            {% include 'partials/mode-switcher.html.twig' with {id: 'mode-drawer', variant: 'drawer'} %}
+        </div>
+    {% endif %}
+    {% if config.plugins.simplesearch.enabled %}
+        <div class="d2-drawer-search">
+            {% include 'partials/simplesearch_searchbox.html.twig' with {field_id: 'site-menu-query'} %}
+        </div>
+    {% endif %}
+</dialog>

@@ -1,0 +1,30 @@
+{% set categories = page.header.categories|default([]) %}
+{# Count is a theme setting (default 6); the module's own limit applies only when the setting is empty. #}
+{% set limit = theme_var('home.latest_count')|default(page.header.limit|default(6)) %}
+{# Series the owner does not want promoted on Home (theme setting, default: Skills). #}
+{% set excluded = theme_var('category_chip_exclude')|default([])|map(tag => tag|lower) %}
+{% set collection = grav.pages.all().published().routable()
+    |filter(item => item.template == 'blog_item'
+        and not item.modular
+        and not (item.route starts with '/_modules/')
+        and not (item.route starts with '/home/')
+        and not item.header.access
+        and not item.header.hideonhome
+        and item.taxonomy.tag|default([])|filter(tag => tag|lower in excluded) is empty
+        and (not item.language or item.language == html_lang)
+        and (categories is empty or item.taxonomy.category is empty or item.taxonomy.category|filter(category => category in categories) is not empty)) %}
+{% set collection = collection|sort((left, right) => right.date <=> left.date)|slice(0, limit) %}
+{% set heading_id = page.header.id|default('clanky') %}
+
+<section class="d2-wrap d2-section {{ page.header.class }}" aria-labelledby="{{ heading_id }}">
+    <h2 class="d2-section-title" id="{{ heading_id }}">{{ page.title }}</h2>
+    {% if collection|length %}
+        <ul class="d2-grid" role="list">
+            {% for item in collection %}
+                <li>{% include 'partials/card.html.twig' with {page: item} only %}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="d2-empty">{{ 'THEME_DENUO2.HOME.EMPTY'|t }}</p>
+    {% endif %}
+</section>

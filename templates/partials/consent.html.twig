@@ -1,0 +1,21 @@
+{#
+    Cookie banner asking for optional cookies (necessary ones are always used). Rendered hidden; js/consent.js shows it when no choice
+    is stored (or the stored one is older than 12 months) and reopens it from the footer link.
+    Both choices use the same button style so neither is pushed.
+#}
+{% set privacy = privacy|default(denuo_privacy()) %}
+{% if privacy.banner %}
+    <section class="d2-consent" id="d2-consent" aria-labelledby="d2-consent-title" hidden>
+        <h2 class="d2-consent-title" id="d2-consent-title">{{ privacy.title }}</h2>
+        {% if privacy.message %}
+            <p class="d2-consent-text">
+                {{ privacy.message }}
+                {% if privacy.policy_url %}<a href="{{ privacy.policy_url }}">{{ 'THEME_DENUO2.CONSENT.DETAILS'|t }}</a>{% endif %}
+            </p>
+        {% endif %}
+        <div class="d2-consent-actions">
+            <button type="button" class="d2-btn d2-btn--sm" data-consent="accept">{{ privacy.accept }}</button>
+            <button type="button" class="d2-btn d2-btn--sm" data-consent="reject">{{ privacy.reject }}</button>
+        </div>
+    </section>
+{% endif %}

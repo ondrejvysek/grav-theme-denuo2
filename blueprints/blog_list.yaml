@@ -1,0 +1,63 @@
+title: 'Category listing'
+'@extends':
+    type: default
+    context: blueprints://pages
+
+form:
+  fields:
+    tabs:
+      fields:
+        category:
+          type: tab
+          title: Category
+          fields:
+            header.heading:
+              type: text
+              label: Page heading (H1)
+              help: 'Empty: the design header text, then the page title.'
+              size: long
+            header.intro:
+              type: textarea
+              label: Intro sentence
+              help: 'One sentence under the heading; also used as the meta description when none is set. Empty: the design lead text.'
+              rows: 2
+            header.seo.title:
+              type: text
+              label: Search title
+              help: 'The site name is appended. Empty: the category title pattern from the theme settings.'
+              size: long
+            header.seo.description:
+              type: textarea
+              label: Description
+              help: 'Meta description and social text, 120–160 characters. Empty: the intro sentence.'
+              rows: 2
+            header.design.image:
+              type: text
+              label: Illustration
+              help: 'Picture shown beside the heading, a path under /user/images (e.g. /user/images/blog.webp). Shown at most at its own size; hidden on phones.'
+              size: long
+            header.chips:
+              type: array
+              label: Filter chips
+              help: 'Tags shown as filter chips, in this order. Empty: the five most used tags in this category.'
+              value_only: true
+
+            category_feed:
+              type: section
+              title: Feed
+              text: 'Used by the feed plugin for this category''s RSS / Atom feed (e.g. /ai.rss). Empty: the feed plugin''s settings.'
+              underline: true
+            header.feed.limit:
+              type: text
+              label: Feed count
+              size: x-small
+              validate:
+                type: int
+            header.feed.title:
+              type: text
+              label: Feed title
+              size: long
+            header.feed.description:
+              type: text
+              label: Feed description
+              size: long

@@ -1,0 +1,10 @@
+{#
+    Site hook, rendered at the end of <head>. Empty in the theme: a site overrides this file in its
+    own folder (templates/partials/site-head.html.twig, see "Site overrides" in the README) to add
+    meta tags, styles or scripts without copying base.html.twig. For example:
+
+        {% do assets.addCss('theme://css/site.css', {priority: 90}) %}
+        {% if 'my-widget' in page.content %}
+            {% do assets.addJs('theme://js/my-widget.js', {group: 'bottom', loading: 'defer'}) %}
+        {% endif %}
+#}

@@ -1,0 +1,45 @@
+{# Format specification: https://tools.ietf.org/html/rfc4287 #}
+{% set collection = collection|default(page.collection) %}
+{% set feed_updated = 0 %}
+{% for page in collection %}
+    {%- set dates = denuo_dates(page) %}
+    {%- set feed_updated = max(feed_updated, dates.published ?? 0) %}
+    {%- if collection.params.show_last_modified %}
+        {%- set feed_updated = max(feed_updated, dates.modified ?? 0) %}
+    {%- endif %}
+{% endfor %}
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>{{ collection.params.title }}</title>
+    <link href="{{ uri.rootUrl(true)~uri.uri() }}" rel="self" />
+    <subtitle>{{ collection.params.description }}</subtitle>
+    <updated>{{ feed_updated|date("Y-m-d\\TH:i:sP") }}</updated>
+    <author>
+        <name>{{ site.title }}</name>
+    </author>
+    <id>{{ page.url(true) }}</id>
+    {% for item in collection %}
+    {% set banner = item.media.images|first %}
+    <entry>
+        <title>{{ item.title|e }}</title>
+        {% if item.header.author %}<author><name>{{ item.header.author }}</name></author>{% endif %}
+        <id>{{ item.url(true, true) }}</id>
+        {% set dates = denuo_dates(item) %}
+        {% set updated = collection.params.show_last_modified ? (dates.modified ?? dates.published) : dates.published %}
+        <updated>{{ (updated ?? 0)|date("Y-m-d\\TH:i:sP") }}</updated>
+        {% if dates.published %}<published>{{ dates.published|date("Y-m-d\\TH:i:sP") }}</published>{% endif %}
+        <link href="{{ item.url(true, true) }}"/>
+        {% for tag in item.taxonomy.tag %}
+        <category term="{{ tag|e }}" />
+        {% endfor %}
+        <content type="html">
+            <![CDATA[
+            {% if banner %}
+            {{ banner.cropZoom(1200,800).html|raw }}
+            {% endif %}
+                {{ article_summary(item, collection.params.length)|e }}
+            ]]>
+        </content>
+    </entry>
+    {% endfor %}
+</feed>

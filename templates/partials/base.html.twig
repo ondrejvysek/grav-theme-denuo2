@@ -1,0 +1,113 @@
+{% set tokens = denuo_tokens() -%}
+{% set fonts = denuo_fonts() -%}
+{% set privacy = denuo_privacy() -%}
+{% set seo = denuo_metadata(page, collection|default(null)) -%}
+<!DOCTYPE html>
+<html lang="{{ grav.language.getActive ?: grav.config.site.default_lang }}" data-theme="{{ tokens.mode }}">
+    <head>
+        <meta charset="utf-8">
+        {% if tokens.switcher %}
+            {# Re-apply the visitor's colour mode before paint, even if a cache served this page. #}
+            <script>(()=>{const m=document.cookie.match(/(?:^|; )denuo_mode=(light|sunset|dark)(?:;|$)/);if(m)document.documentElement.dataset.theme=m[1];})();</script>
+        {% endif %}
+        {% if simplesearch_is_search_page %}
+            <title>{{ 'THEME_DENUO2.SEARCH.TITLE'|t }}{% if query %}: {{ query }}{% endif %} | {{ seo.site_name }}</title>
+        {% else %}
+            <title>{{ seo.title }}</title>
+        {% endif %}
+        {% block head %}
+        {% if seo.canonical and not simplesearch_is_search_page %}
+            <link rel="canonical" href="{{ seo.canonical }}">
+        {% endif %}
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+        {# Body text and headings are above the fold on every page. #}
+        {% for font_url in fonts.preload %}
+            <link rel="preload" as="font" type="font/woff2" crossorigin="anonymous" href="{{ font_url }}">
+        {% endfor %}
+        {% if tokens.mode == 'auto' %}
+            <meta name="theme-color" media="(prefers-color-scheme: light)" content="{{ tokens.theme_color.light }}">
+            <meta name="theme-color" media="(prefers-color-scheme: dark)" content="{{ tokens.theme_color.dark }}">
+        {% else %}
+            <meta name="theme-color" content="{{ tokens.theme_color[tokens.mode] }}">
+        {% endif %}
+        {% include 'partials/metadata.html.twig' %}
+        {% if config.plugins.langswitcher.enabled|default(false) and langswitcher is defined and langswitcher.languages|length > 1 %}
+            {% include 'partials/lang-hreflang.html.twig' %}
+        {% endif %}
+        {% if tokens.switcher %}
+            <script type="application/json" id="d2-mode-config">{{ tokens.theme_color|json_encode(constant('JSON_HEX_TAG'))|raw }}</script>
+        {% endif %}
+        {% if privacy.ga4 %}
+            {# Google Consent Mode v2: everything denied until the visitor accepts (js/consent.js).
+               gtag.js is only requested after consent. #}
+            <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});</script>
+            <script type="application/json" id="d2-privacy">{{ {ga4: privacy.ga4, banner: privacy.banner}|json_encode(constant('JSON_HEX_TAG'))|raw }}</script>
+        {% endif %}
+        {% block assets %}
+            {% do assets.addCss('theme://css/denuo2.css?v=2.8.0', {priority: 100}) %}
+            {% do assets.addJs('theme://js/site.js?v=2.1.1', {priority: 50, group: 'bottom', loading: 'defer'}) %}
+            {% if tokens.switcher %}
+                {% do assets.addJs('theme://js/mode.js?v=2.3.0', {priority: 48, group: 'bottom', loading: 'defer'}) %}
+            {% endif %}
+            {% if privacy.ga4 %}
+                {% do assets.addJs('theme://js/consent.js?v=2.3.1', {priority: 45, group: 'bottom', loading: 'defer'}) %}
+            {% endif %}
+            {# Site hook: a site adds its own head tags, styles and scripts here (see the README). #}
+            {% include 'partials/site-head.html.twig' %}
+        {% endblock %}
+        {% include 'partials/site-icons.html.twig' %}
+        {% endblock head %}
+        {{ assets.css()|raw }}
+        <style id="d2-tokens">{{ fonts.css|raw }}{{ tokens.css|raw }}</style>
+        {{ assets.js()|raw }}
+    </head>
+    <body class="{% block body_classes %}{{ page.header.body_classes }}{% endblock %}">
+        <a class="visually-hidden-focusable d2-skip" href="#main-content">{{ 'THEME_DENUO2.SKIP_TO_CONTENT'|t }}</a>
+
+        {% block header_navigation %}
+            {% include 'partials/navigation.html.twig' %}
+        {% endblock %}
+
+        {% block breadcrumb %}{% include 'partials/breadcrumbs.html.twig' %}{% endblock %}
+        <main id="main-content" tabindex="-1">{% block content %}{% endblock %}</main>
+        {% block pagination %}{% endblock %}
+
+        {% block footer %}{% include 'partials/footer.html.twig' %}{% endblock %}
+        {# Texts for the theme scripts (mode switcher, image preview). #}
+        <script type="application/json" id="d2-i18n">{{ {
+            modes: {light: 'THEME_DENUO2.MODE.LIGHT'|t, sunset: 'THEME_DENUO2.MODE.SUNSET'|t, dark: 'THEME_DENUO2.MODE.DARK'|t},
+            modeCurrent: 'THEME_DENUO2.MODE.CURRENT'|t,
+            imageAlt: 'THEME_DENUO2.ARTICLE.IMAGE_ALT'|t
+        }|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_UNESCAPED_UNICODE'))|raw }}</script>
+        {% if config.plugins.simplesearch.enabled %}
+            <dialog id="site-search-dialog" class="d2-search-dialog" aria-labelledby="site-search-title">
+                <div class="d2-dialog-head">
+                    <h2 id="site-search-title" class="d2-dialog-title">{{ 'THEME_DENUO2.SEARCH.TITLE'|t }}</h2>
+                    <form method="dialog">
+                        <button type="submit" class="d2-btn d2-btn--ghost d2-btn--icon" aria-label="{{ 'THEME_DENUO2.SEARCH.CLOSE'|t }}">{% include 'partials/close-icon.html.twig' %}</button>
+                    </form>
+                </div>
+                {% include 'partials/simplesearch_searchbox.html.twig' with {field_id: 'site-search-query', autofocus: true} %}
+            </dialog>
+            <script>
+                (() => {
+                    const dialog = document.getElementById('site-search-dialog');
+                    const trigger = document.getElementById('site-search-trigger');
+                    if (!trigger || typeof dialog.showModal !== 'function') return;
+
+                    if (trigger.commandForElement !== dialog) {
+                        trigger.addEventListener('click', () => {
+                            if (!dialog.open) dialog.showModal();
+                        });
+                    }
+                    dialog.addEventListener('close', () => trigger.focus());
+                })();
+            </script>
+        {% endif %}
+        {% include 'partials/consent.html.twig' %}
+        {% block bottom %}
+            {{ assets.css('bottom')|raw }}
+            {{ assets.js('bottom')|raw }}
+        {% endblock %}
+    </body>
+</html>

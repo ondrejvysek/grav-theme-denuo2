@@ -1,0 +1,60 @@
+{#
+    One article card for Home, category listings, related articles and search.
+    The title link is the card's only link; its ::after covers the whole card.
+
+    page      article page (required)
+    featured  wide variant: image left, larger title (default false)
+    label     tag text (default: the article's category, i.e. its parent's menu title)
+    heading   heading element for the title (default 'h3')
+    eager     load the image eagerly, e.g. above the fold (default false)
+#}
+{% set featured = featured|default(false) %}
+{% set heading = heading|default('h3') in ['h2', 'h3', 'h4'] ? heading|default('h3') : 'h3' %}
+{% set label = label|default(page.parent.menu ?: page.parent.title) %}
+{% set href = page.header.link ?: page.url %}
+{% set summary = article_summary(page, featured ? 180 : 140) %}
+{% set minutes = denuo_reading_time(page) %}
+
+{% set source = denuo_card_image(page) %}
+{% set image = source.image|default(null) %}
+{% set fallback = page.parent.header.design.image|default('') ?: denuo_brand().fallback_image %}
+{# Never upscale: keep the widths the source can fill, always at least the smallest. #}
+{% set all_widths = featured ? [640, 960, 1280] : [400, 640, 960] %}
+{% set widths = all_widths|filter(w => w <= source.max_width|default(0)) %}
+{% set widths = widths ?: [all_widths|first] %}
+{% set base = featured ? (960 in widths ? 960 : widths|last) : (640 in widths ? 640 : widths|last) %}
+{% set sizes = featured
+    ? '(min-width: 1296px) 604px, (min-width: 768px) calc(52vw - 64px), calc(100vw - 58px)'
+    : '(min-width: 1296px) 360px, (min-width: 992px) calc(33vw - 74px), (min-width: 640px) calc(46vw - 38px), calc(100vw - 58px)' %}
+
+<article class="d2-card{{ featured ? ' d2-card--featured' }}">
+    <div class="d2-card-media">
+        {% if image and not (image.extension|lower ends with 'gif') %}
+            {% set srcset = [] %}
+            {% for w in widths %}
+                {% set srcset = srcset|merge([image.cropZoom(w, (w * 9 / 16)|round).format('webp').url ~ ' ' ~ w ~ 'w']) %}
+            {% endfor %}
+            <img class="d2-thumb" src="{{ image.cropZoom(base, (base * 9 / 16)|round).format('webp').url }}"
+                 srcset="{{ srcset|join(', ') }}" sizes="{{ sizes }}"
+                 width="{{ base }}" height="{{ (base * 9 / 16)|round }}" alt=""
+                 {% if eager|default(false) %}loading="eager"{% if featured %} fetchpriority="high"{% endif %}{% else %}loading="lazy"{% endif %} decoding="async">
+        {% else %}
+            {# Animated GIFs keep their animation; otherwise the category or brand fallback image. #}
+            {% if image or fallback %}
+                <img class="d2-thumb" src="{{ image ? image.url : fallback }}" width="{{ base }}" height="{{ (base * 9 / 16)|round }}" alt=""
+                     loading="{{ eager|default(false) ? 'eager' : 'lazy' }}" decoding="async"{% if not image %} data-image-fallback{% endif %}>
+            {% else %}
+                <div class="d2-thumb" aria-hidden="true"></div>
+            {% endif %}
+        {% endif %}
+    </div>
+    <div class="d2-card-body">
+        {% if label %}<span class="d2-tag">{{ featured ? 'THEME_DENUO2.CARD.LATEST'|t ~ ' · ' }}{{ label }}</span>{% endif %}
+        <{{ heading }} class="d2-card-title"><a class="d2-card-link" href="{{ href }}">{{ page.title|trim }}</a></{{ heading }}>
+        {% if summary %}<p class="d2-card-excerpt">{{ summary }}</p>{% endif %}
+        <p class="d2-meta">
+            <time datetime="{{ page.date|date('c') }}">{{ denuo_date(page.date) }}</time>
+            {%- if minutes %} · {{ minutes }}&nbsp;{{ 'THEME_DENUO2.CARD.READING'|t }}{% endif %}
+        </p>
+    </div>
+</article>

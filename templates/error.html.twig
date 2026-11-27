@@ -1,0 +1,30 @@
+{% extends 'partials/base.html.twig' %}
+
+{% block content %}
+    <section class="d2-wrap d2-status-page" aria-labelledby="error-title">
+        <div class="d2-status-card">
+            <div class="d2-status-text">
+                <span class="d2-tag">{{ 'THEME_DENUO2.ERROR.TAG'|t }}</span>
+                <h1 id="error-title">{{ 'THEME_DENUO2.ERROR.TITLE'|t }}</h1>
+                <p class="d2-page-intro">{{ 'THEME_DENUO2.ERROR.TEXT'|t }}</p>
+                {% if config.plugins.simplesearch.enabled %}
+                    {% include 'partials/simplesearch_searchbox.html.twig' with {field_id: 'error-query'} %}
+                {% endif %}
+                <p class="d2-status-actions">
+                    <a class="d2-btn d2-btn--lg" href="{{ url('/') }}">{{ 'THEME_DENUO2.ERROR.HOME'|t }}</a>
+                </p>
+            </div>
+            {# A small console that tries to reach the missing page; decorative only. #}
+            <div class="d2-console" aria-hidden="true">
+                <div class="d2-console-bar"><span></span><span></span><span></span></div>
+                <pre class="d2-console-body"><code><span class="d2-console-prompt">&gt;</span> ping {% set path = uri.path|default('/') %}{{ path|length > 36 ? path|slice(0, 35) ~ '…' : path }}
+{{ 'THEME_DENUO2.ERROR.CONSOLE_TIMEOUT'|t }}
+{{ 'THEME_DENUO2.ERROR.CONSOLE_TIMEOUT'|t }}
+<span class="d2-console-prompt">&gt;</span> {{ 'THEME_DENUO2.ERROR.CONSOLE_RESTART'|t }}
+{{ 'THEME_DENUO2.ERROR.CONSOLE_RESULT'|t }}
+<span class="d2-console-prompt">&gt;</span> <span class="d2-console-cursor"></span></code></pre>
+            </div>
+        </div>
+        {% include 'partials/topics.html.twig' with {id: 'error-topics'} %}
+    </section>
+{% endblock %}

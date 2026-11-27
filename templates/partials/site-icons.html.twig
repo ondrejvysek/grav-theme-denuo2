@@ -1,0 +1,4 @@
+{% set brand = denuo_brand() %}
+{% if brand.touch_icon %}<link rel="apple-touch-icon" sizes="180x180" href="{{ url(brand.touch_icon, true) }}">{% endif %}
+<link rel="icon" type="image/x-icon" href="{{ url('/favicon.ico', true) }}">
+{% if brand.logo %}<link rel="icon" type="image/svg+xml" sizes="any" href="{{ url(brand.logo, true) }}">{% endif %}

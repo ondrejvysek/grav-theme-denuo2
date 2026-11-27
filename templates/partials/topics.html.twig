@@ -1,0 +1,12 @@
+{#
+    Topic chips: the visible top-level sections.
+    Parameters: id (heading id, required), anchor (optional id on the nav), wrap (adds d2-wrap).
+#}
+<nav class="{{ wrap|default(false) ? 'd2-wrap ' }}d2-topics"{% if anchor|default('') %} id="{{ anchor }}"{% endif %} aria-labelledby="{{ id }}">
+    <h2 class="d2-eyebrow" id="{{ id }}">{{ 'THEME_DENUO2.TOPICS'|t }}</h2>
+    <ul class="d2-chips" role="list">
+        {% for item in pages.children.visible|filter(item => item.routable) %}
+            <li><a class="d2-chip" href="{{ item.url }}">{{ item.menu }}</a></li>
+        {% endfor %}
+    </ul>
+</nav>

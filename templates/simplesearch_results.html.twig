@@ -1,0 +1,38 @@
+{% extends 'partials/base.html.twig' %}
+
+{% block content %}
+    {% set count = search_results ? search_results.count : 0 %}
+    <div class="d2-wrap d2-search-page">
+        <header class="d2-status-card d2-search-head">
+            <div class="d2-status-text">
+                <h1>{{ 'THEME_DENUO2.SEARCH.TITLE'|t }}</h1>
+                {% include 'partials/simplesearch_searchbox.html.twig' with {field_id: 'search-page-query', size: 'lg'} %}
+                <p class="d2-search-summary" aria-live="polite">
+                    {%- if query -%}
+                        {# Czech has three plural forms (1 / 2–4 / 0 and 5+); other languages repeat MANY in FEW. #}
+                        {%- set form = count == 1 ? 'ONE' : (count >= 2 and count <= 4 ? 'FEW' : 'MANY') -%}
+                        {{ ('THEME_DENUO2.SEARCH.SUMMARY_' ~ form)|t(count, query) }}
+                    {%- endif -%}
+                </p>
+            </div>
+        </header>
+
+        {% if count %}
+            <ul class="d2-grid d2-search-results" role="list">
+                {% for result in search_results %}
+                    <li>{% include 'partials/card.html.twig' with {page: result, heading: 'h2'} only %}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="d2-empty d2-search-empty">
+                <svg class="d2-empty-icon" width="48" height="48" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+                    <circle cx="21" cy="21" r="13" fill="none" stroke="currentColor" stroke-width="3"/>
+                    <path d="M31 31l10 10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                    {% if query %}<path d="M17 17.5a4 4 0 1 1 5.5 3.7c-1 .4-1.5 1.1-1.5 2.1V24M21 28.2v.1" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>{% endif %}
+                </svg>
+                <p>{{ (query ? 'THEME_DENUO2.SEARCH.NO_RESULTS' : 'THEME_DENUO2.SEARCH.START')|t }}</p>
+                {% include 'partials/topics.html.twig' with {id: 'search-topics'} %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

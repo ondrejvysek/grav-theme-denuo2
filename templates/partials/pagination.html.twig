@@ -1,0 +1,31 @@
+{% set pagination = pagination|default(page.collection.params.pagination) %}
+{% set base_url = base_url|default(page.url) %}
+
+{% if pagination|length > 1 %}
+<nav class="d2-pagination" aria-label="{{ 'THEME_DENUO2.PAGINATION.LABEL'|t }}">
+    {% set archive_url = base_url|trim('/', 'right') ~ pagination.params %}
+    {% set current = pagination.currentPage %}
+    {% set last = pagination.pageCount %}
+    {% set first_visible = current <= 5 ? 1 : current - 2 %}
+    {% set last_visible = current >= last - 4 ? last : current + 2 %}
+    <ul class="d2-pagination-list" role="list">
+        {% if pagination.hasPrev %}
+            <li><a class="d2-pagination-pill" rel="prev" href="{{ (archive_url ~ pagination.prevUrl) ?: '/' }}"><span aria-hidden="true">←</span> {{ 'THEME_DENUO2.PAGINATION.PREVIOUS'|t }}</a></li>
+        {% endif %}
+
+        {% for paginate in pagination %}
+            {% if paginate.isCurrent %}
+                <li><span class="d2-pagination-pill" aria-current="page"><span class="visually-hidden">{{ 'THEME_DENUO2.PAGINATION.PAGE'|t }} </span>{{ paginate.number }}</span></li>
+            {% elseif paginate.number == 1 or paginate.number == last or paginate.number in first_visible..last_visible %}
+                <li><a class="d2-pagination-pill" href="{{ (archive_url ~ paginate.url) ?: '/' }}"><span class="visually-hidden">{{ 'THEME_DENUO2.PAGINATION.PAGE'|t }} </span>{{ paginate.number }}</a></li>
+            {% elseif paginate.number == first_visible - 1 or paginate.number == last_visible + 1 %}
+                <li aria-hidden="true"><span class="d2-pagination-ellipsis">…</span></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if pagination.hasNext %}
+            <li><a class="d2-pagination-pill" rel="next" href="{{ archive_url ~ pagination.nextUrl }}">{{ 'THEME_DENUO2.PAGINATION.NEXT'|t }} <span aria-hidden="true">→</span></a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}

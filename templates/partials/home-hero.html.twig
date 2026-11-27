@@ -1,0 +1,32 @@
+{% set hero = denuo_hero() %}
+{% set image = denuo_local_image(hero.image) %}
+<section class="d2-wrap d2-hero" aria-labelledby="home-title">
+    <div class="d2-hero-text">
+        {% if hero.tag %}<span class="d2-tag">{{ hero.tag }}</span>{% endif %}
+        <h1 id="home-title">{{ hero.title ?: denuo_brand().name }}</h1>
+        {% if hero.lead %}<p class="d2-hero-lead">{{ hero.lead }}</p>{% endif %}
+        {# The primary button links to the latest articles by default; its text comes from the
+           translations unless set. Clear its link to hide it. #}
+        {% set primary_label = hero.primary.url ? (hero.primary.label ?: 'THEME_DENUO2.HOME.LATEST'|t) : '' %}
+        {% if primary_label or hero.secondary.label %}
+            <div class="d2-hero-actions">
+                {% if primary_label %}
+                    <a class="d2-btn d2-btn--lg" href="{{ denuo_link(hero.primary.url) }}">{{ primary_label }}</a>
+                {% endif %}
+                {% if hero.secondary.label and hero.secondary.url %}
+                    <a class="d2-btn d2-btn--outline d2-btn--lg" href="{{ denuo_link(hero.secondary.url) }}">{{ hero.secondary.label }}</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    {% if image %}
+        <div class="d2-hero-media">
+            <img src="{{ image.url }}" width="{{ image.width }}" height="{{ image.height }}"
+                 alt="{{ hero.image_alt|default('') }}" loading="eager" fetchpriority="high" decoding="async">
+        </div>
+    {% endif %}
+</section>
+
+{% if theme_var('home.topics') %}
+    {% include 'partials/topics.html.twig' with {id: 'topics-title', anchor: 'temata', wrap: true} %}
+{% endif %}

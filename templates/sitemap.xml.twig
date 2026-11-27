@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+{% if config.plugins.sitemap.xsl_transform %}
+<?xml-stylesheet type="text/xsl" href="{{ url('theme://assets/sitemap.xsl') }}"?>
+{% endif %}
+<urlset
+  xmlns="{{ config.plugins.sitemap.urlset|default('http://www.sitemaps.org/schemas/sitemap/0.9') }}"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+{% for entry in sitemap %}
+  <url>
+    <loc>{{ entry.location|e }}</loc>
+    {# fix a small typo: plugins, not plugin #}
+    {% if config.plugins.sitemap.include_news_tags
+          and config.plugins.sitemap.standalone_sitemap_news == false
+          and timestamp_within_days(entry.timestamp, config.plugins.sitemap.news_max_age_days|default(2))
+          and entry.rawroute|starts_with(config.plugins.sitemap.news_enabled_paths) %}
+      {% include 'sitemap-extensions/news.xml.twig' %}
+    {% endif %}
+    {% for hreflang in entry.hreflangs %}
+      <xhtml:link rel="alternate" hreflang="{{ hreflang.hreflang }}" href="{{ hreflang.href }}" />
+    {% endfor %}
+    {% if entry.lastmod %}
+      <lastmod>{{ entry.lastmod|e }}</lastmod>
+    {% endif %}
+    {# Optional: Google ignores these, you can drop them #}
+    {# {% if entry.changefreq %}<changefreq>{{ entry.changefreq }}</changefreq>{% endif %} #}
+    {# {% if entry.priority %}<priority>{{ entry.priority|number_format(1) }}</priority>{% endif %} #}
+    {% for image in entry.images %}
+      {% include 'sitemap-extensions/image.xml.twig' %}
+    {% endfor %}
+  </url>
+{% endfor %}
+</urlset>

@@ -1,0 +1,104 @@
+title: Article
+'@extends':
+    type: default
+    context: blueprints://pages
+
+form:
+  fields:
+    tabs:
+      fields:
+        article:
+          type: tab
+          title: Article
+          fields:
+            article_common:
+              type: section
+              title: Summary and byline
+              underline: true
+            header.seo.description:
+              type: textarea
+              label: Description
+              help: 'Meta description, social text and card text. 120–160 characters. Empty: the opening of the article.'
+              rows: 2
+            header.metadata.keywords:
+              type: text
+              label: Keywords
+              size: long
+            header.author:
+              type: text
+              label: Author
+              help: 'Shown in the byline and the author card (with the author-info plugin: title, bio and avatar).'
+            header.readingtime:
+              type: text
+              label: Reading time (minutes)
+              help: 'Empty: estimated from the text at about 170 words a minute.'
+              size: x-small
+            header.verified:
+              type: date
+              label: Facts verified on
+              help: 'Date the facts in the article were last checked; shown in the byline. Empty: not shown.'
+            header.tldr:
+              type: array
+              label: TL;DR
+              help: 'Optional key points shown in a card at the top of the article, one per row. Empty: no card.'
+              value_only: true
+            header.toc:
+              type: toggle
+              label: Table of contents
+              help: 'Shown next to the article (on phones a collapsible "Obsah" box). Hide it for short articles or pages where it gets in the way.'
+              highlight: 1
+              default: 1
+              options:
+                1: Show
+                0: Hide
+              validate:
+                type: bool
+            header.seo.title:
+              type: text
+              label: Search title
+              help: 'Shorter title for search results and social cards; the site name is added. Keep the whole under 60 characters. Empty: the article title.'
+              size: long
+
+            article_images:
+              type: section
+              title: Images
+              text: 'Cards and the article hero use whichever of these images gives the largest crop (16:9 for cards, 16:7 for the hero), so a large original works best.'
+              underline: true
+            header.seo.image:
+              type: filepicker
+              label: Main image
+              preview_images: true
+              help: 'At least 1600×900. Also cropped for social cards (1200×630) and search results. Empty: the largest suitable image in the page folder.'
+            header.seo.image_alt:
+              type: text
+              label: Main image description
+              help: 'What the image shows, for social cards and image search. Empty: the article title.'
+              size: long
+            header.preview_image_file:
+              type: filepicker
+              label: Card image
+              preview_images: true
+              help: 'Optional separate image for article cards.'
+            header.hero_image_file_lg:
+              type: filepicker
+              label: Hero image
+              preview_images: true
+              help: 'Optional separate image for the top of the article.'
+
+            article_seo:
+              type: section
+              title: Search engines
+              underline: true
+            header.seo.robots:
+              type: select
+              label: Indexing
+              default: ''
+              options:
+                '': 'Index (default)'
+                'noindex': 'Do not index, follow links'
+                'noindex, nofollow': 'Do not index, do not follow links'
+            header.seo.canonical:
+              type: text
+              label: Canonical URL
+              help: 'Only for an article first published elsewhere: the full URL of the original. Empty: this page.'
+              size: long

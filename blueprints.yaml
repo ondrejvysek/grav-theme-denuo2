@@ -1,0 +1,402 @@
+name: Denuo2
+slug: denuo2
+type: theme
+version: 2.0.0
+description: 'Editorial blog theme for Grav: pastel gradient, rounded cards, pill navigation, light, sunset, dark and auto colour modes with admin-defined base colours and fonts, no CSS framework, accessible and fast. Czech and English front-end texts.'
+icon: bold
+author:
+  name: Ondrej Vysek
+homepage: https://github.com/ondrejvysek/grav-theme-denuo2
+bugs: https://github.com/ondrejvysek/grav-theme-denuo2/issues
+docs: https://github.com/ondrejvysek/grav-theme-denuo2/blob/main/README.md
+keywords: blog, magazine, editorial, cards, dark mode, accessible, czech, english
+license: MIT
+
+dependencies:
+  - { name: grav, version: '>=1.7.0' }
+
+form:
+  validation: loose
+  fields:
+    tabs:
+      type: tabs
+      active: 1
+      fields:
+
+        appearance:
+          type: tab
+          title: Appearance
+          fields:
+            color_mode:
+              type: select
+              label: Colour mode
+              help: 'The mode every visitor sees, or the starting mode when the switcher is shown. Auto follows the visitor''s operating system (light or dark).'
+              size: small
+              default: light
+              options:
+                light: Light
+                sunset: Sunset
+                dark: Dark
+                auto: Follow the visitor's system
+            mode_switcher:
+              type: toggle
+              label: Show colour mode switcher
+              help: 'Adds a light / sunset / dark switch next to the search button (in the menu on phones). The visitor''s choice is kept for 12 months in the denuo_mode cookie, a functional preference that needs no consent. Off: everyone sees the colour mode above.'
+              highlight: 0
+              default: 0
+              options:
+                1: Enabled
+                0: Disabled
+              validate:
+                type: bool
+
+            colors_light_section:
+              type: section
+              title: Base colours – light mode
+              text: 'All other colours (headings, muted text, borders, tags, links, shadows) are calculated from these. Text needs at least 4.5:1 contrast against the background and the surface; saving warns when a pair falls below that.'
+              underline: true
+            colors.light.bg_start:
+              type: colorpicker
+              label: Background – gradient start
+              default: '#E3EAFF'
+            colors.light.bg_middle:
+              type: colorpicker
+              label: Background – gradient middle
+              default: '#F2ECFA'
+            colors.light.bg_end:
+              type: colorpicker
+              label: Background – gradient end
+              default: '#E8F2FB'
+            colors.light.surface:
+              type: colorpicker
+              label: Surface (cards, pills)
+              default: '#FFFFFF'
+            colors.light.text:
+              type: colorpicker
+              label: Text
+              default: '#2B2D45'
+            colors.light.primary:
+              type: colorpicker
+              label: Primary (buttons, links)
+              default: '#5B3FD9'
+            colors.light.accent:
+              type: colorpicker
+              label: Accent (tags, active menu item)
+              default: '#D6E4FF'
+
+            colors_dark_section:
+              type: section
+              title: Base colours – dark mode
+              underline: true
+            colors.dark.bg_start:
+              type: colorpicker
+              label: Background – gradient start
+              default: '#08111F'
+            colors.dark.bg_middle:
+              type: colorpicker
+              label: Background – gradient middle
+              default: '#0C1A2E'
+            colors.dark.bg_end:
+              type: colorpicker
+              label: Background – gradient end
+              default: '#0A1526'
+            colors.dark.surface:
+              type: colorpicker
+              label: Surface (cards, pills)
+              default: '#112139'
+            colors.dark.text:
+              type: colorpicker
+              label: Text
+              default: '#E3ECF8'
+            colors.dark.primary:
+              type: colorpicker
+              label: Primary (buttons, links)
+              default: '#5AB0FF'
+            colors.dark.accent:
+              type: colorpicker
+              label: Accent (tags, active menu item)
+              default: '#1B3354'
+
+            colors_sunset_section:
+              type: section
+              title: Base colours – sunset mode
+              text: 'A warm dusk theme: dark background, light text.'
+              underline: true
+            colors.sunset.bg_start:
+              type: colorpicker
+              label: Background – gradient start
+              default: '#24182A'
+            colors.sunset.bg_middle:
+              type: colorpicker
+              label: Background – gradient middle
+              default: '#3B2034'
+            colors.sunset.bg_end:
+              type: colorpicker
+              label: Background – gradient end
+              default: '#4A2630'
+            colors.sunset.surface:
+              type: colorpicker
+              label: Surface (cards, pills)
+              default: '#33213A'
+            colors.sunset.text:
+              type: colorpicker
+              label: Text
+              default: '#FCEAE2'
+            colors.sunset.primary:
+              type: colorpicker
+              label: Primary (buttons, links)
+              default: '#FF9A66'
+            colors.sunset.accent:
+              type: colorpicker
+              label: Accent (tags, active menu item)
+              default: '#5A2F45'
+
+        brand:
+          type: tab
+          title: Brand
+          fields:
+            brand.name:
+              type: text
+              label: Site name
+              help: 'Shown next to the logo in the header and footer, and as the copyright owner and publisher name. Empty: the site title from System → Site. Page titles in the browser tab use the site title.'
+              size: medium
+            brand.logo:
+              type: text
+              label: Logo
+              help: 'Square logo shown in the header and footer and as the SVG favicon. A path under /user/images (SVG recommended). Empty: the site name is shown without a logo.'
+              placeholder: /user/images/logo/logo.svg
+              size: long
+            brand.touch_icon:
+              type: text
+              label: Touch icon
+              help: '180×180 PNG for phone home screens. Empty: not added.'
+              placeholder: /user/images/logo/touch-icon.png
+              size: long
+            brand.publisher_logo:
+              type: text
+              label: Publisher logo
+              help: 'At least 512×512 PNG, used in article structured data (search engines). Empty: not added.'
+              placeholder: /user/images/logo/logo-512.png
+              size: long
+            brand.fallback_image:
+              type: text
+              label: Fallback image
+              help: 'Used for article cards and social previews when neither the article nor its category has an image.'
+              placeholder: /user/images/fallback.webp
+              size: long
+            brand.font_heading:
+              type: select
+              label: Heading font
+              help: 'Headings and card titles. The bundled fonts include Czech and other Central European letters.'
+              default: manrope
+              options:
+                manrope: Manrope
+                open-sans: 'Open Sans'
+                system: 'System font (no download)'
+            brand.font_body:
+              type: select
+              label: Body font
+              help: 'Text, menus and buttons. The system font loads nothing: Segoe UI on Windows, San Francisco on Apple devices.'
+              default: open-sans
+              options:
+                manrope: Manrope
+                open-sans: 'Open Sans'
+                system: 'System font (no download)'
+
+        seo:
+          type: tab
+          title: SEO
+          fields:
+            seo_intro:
+              type: display
+              size: large
+              markdown: true
+              content: 'Every page gets its description, Open Graph and X tags and schema.org data from its own SEO fields (title, description, image) and these settings. Logo and fallback image come from the Brand tab.'
+            seo.site_name:
+              type: text
+              label: Site name for search and social
+              help: 'Used by Google as the site name, in og:site_name and after every page title. Empty: the site name from Brand.'
+              size: medium
+            seo.publisher_type:
+              type: select
+              label: Publisher
+              default: organization
+              options:
+                organization: 'Organization (a company, community or brand)'
+                person: 'Person (a personal blog)'
+            seo.publisher_name:
+              type: text
+              label: Publisher name
+              help: 'Empty: the site name above.'
+              size: medium
+            seo.same_as:
+              type: array
+              label: Profiles
+              help: 'Full URLs of the publisher''s other profiles (LinkedIn, X, YouTube, GitHub …). Only used in structured data.'
+              value_only: true
+            seo.x_handle:
+              type: text
+              label: X account
+              help: 'For example @contoso. Empty: no twitter:site tag.'
+              size: small
+            seo.large_image_preview:
+              type: toggle
+              label: Large image previews
+              help: 'Lets Google show large image previews (robots max-image-preview:large), needed for Discover.'
+              highlight: 1
+              default: 1
+              options:
+                1: 'Yes'
+                0: 'No'
+              validate:
+                type: bool
+
+        authors:
+          type: tab
+          title: Authors
+          fields:
+            authors_intro:
+              type: display
+              size: large
+              markdown: true
+              content: 'Profiles for the byline and the author card under each article. An article''s `author` (front matter) is matched against the name.'
+            authors:
+              type: list
+              style: vertical
+              label: Authors
+              btnLabel: Add author
+              collapsed: true
+              fields:
+                .name:
+                  type: text
+                  label: Name
+                  help: 'Exactly as written in the articles'' author field.'
+                  validate:
+                    required: true
+                .title:
+                  type: text
+                  label: Title
+                  help: 'Shown in the author card, for example "Cloud architect · Contoso".'
+                .badge:
+                  type: text
+                  label: Byline badge
+                  help: 'Short label after the name in the byline, for example "Microsoft MVP". Empty: none.'
+                  size: medium
+                .avatar:
+                  type: text
+                  label: Photo
+                  help: 'Square image under /user/images (at least 192×192). Empty: initials.'
+                  placeholder: /user/images/authors/name.png
+                  size: long
+                .bio:
+                  type: textarea
+                  label: Short bio
+                  help: 'The first paragraph is shown in the author card.'
+                  rows: 4
+                .url:
+                  type: text
+                  label: Profile page
+                  help: 'Full URL of a page about the author. Only used in structured data and article:author.'
+                  size: long
+                .same_as:
+                  type: textarea
+                  label: Other profiles
+                  help: 'Full URLs (LinkedIn, MVP profile, GitHub …), one per line. Only used in structured data.'
+                  rows: 3
+                .x:
+                  type: text
+                  label: X account
+                  help: 'For example @jane. Used as twitter:creator.'
+                  size: small
+
+        site:
+          type: tab
+          title: Site
+          fields:
+            copy_startyear:
+              type: text
+              label: Copyright – start year
+              help: 'Empty: only the current year is shown.'
+              size: small
+            copy_company:
+              type: text
+              label: Copyright – owner
+              help: 'Empty: the site name.'
+              size: medium
+            category_chip_exclude:
+              type: array
+              label: Tags never promoted
+              help: 'Articles with these tags are left out of the latest articles on Home and of related articles, and the tags are not offered as automatic category chips or card labels. Category listings still show the articles.'
+              value_only: true
+
+        privacy:
+          type: tab
+          title: Privacy & analytics
+          fields:
+            privacy.ga4_id:
+              type: text
+              label: Google Analytics 4 measurement ID
+              help: 'Format G-XXXXXXXXXX (Google Analytics → Admin → Data streams). Empty: no analytics code and no cookie banner.'
+              placeholder: G-XXXXXXXXXX
+              size: medium
+              validate:
+                pattern: '^\s*(G-[A-Za-z0-9]{4,20})?\s*$'
+                message: 'Use the GA4 measurement ID, e.g. G-AB12CD34EF.'
+            privacy.consent_enabled:
+              type: toggle
+              label: Cookie banner
+              help: 'Optional cookies (analytics) start only after the visitor allows them; necessary cookies are always used. Turn off only if consent is handled elsewhere.'
+              highlight: 1
+              default: 1
+              options:
+                1: Enabled
+                0: Disabled
+              validate:
+                type: bool
+            privacy_texts:
+              type: display
+              size: large
+              markdown: true
+              content: 'The banner texts come from the theme translations, in every site language. To change them, override `THEME_DENUO2.CONSENT` in `user/languages/<lang>.yaml`.'
+            privacy.policy_url:
+              type: text
+              label: Privacy policy page
+              help: 'A page route such as /privacy or a full address. Linked from the banner.'
+              size: long
+
+        home:
+          type: tab
+          title: Home page
+          fields:
+            home.hero.enabled:
+              type: toggle
+              label: Theme hero on the home page
+              help: 'On: the theme''s hero is shown on the home page and replaces a _hero module; edit its texts, buttons and image in the home page (Hero tab), per language. Off: the page''s own modules are shown.'
+              highlight: 1
+              default: 1
+              options:
+                1: Enabled
+                0: Disabled
+              validate:
+                type: bool
+            home.topics:
+              type: toggle
+              label: Topic chips under the hero
+              help: 'Chips linking to the top-level sections (anchor #temata).'
+              highlight: 1
+              default: 1
+              options:
+                1: Enabled
+                0: Disabled
+              validate:
+                type: bool
+            home.latest_count:
+              type: number
+              label: Number of latest articles
+              size: x-small
+              default: 6
+              validate:
+                type: int
+                min: 3
+                max: 24
+

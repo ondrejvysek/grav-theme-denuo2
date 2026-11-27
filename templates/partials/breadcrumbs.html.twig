@@ -1,0 +1,22 @@
+{# Built from the page's parents, so it does not depend on the (disabled) breadcrumbs plugin. #}
+{% if page.routable and not page.home and page.template != 'error' and not simplesearch_is_search_page %}
+    {% set trail = [] %}
+    {% set ancestor = page.parent %}
+    {% for i in 1..6 %}
+        {% if ancestor and not ancestor.root and not ancestor.home %}
+            {% if ancestor.routable and ancestor.visible|default(true) %}
+                {% set trail = [ancestor]|merge(trail) %}
+            {% endif %}
+            {% set ancestor = ancestor.parent %}
+        {% endif %}
+    {% endfor %}
+    <nav class="d2-wrap d2-breadcrumb" aria-label="{{ 'THEME_DENUO2.NAV.BREADCRUMB'|t }}">
+        <ol>
+            <li><a href="{{ url('/') }}">{{ 'THEME_DENUO2.NAV.HOME_CRUMB'|t }}</a></li>
+            {% for crumb in trail %}
+                <li><a href="{{ crumb.url }}">{{ crumb.menu }}</a></li>
+            {% endfor %}
+            <li aria-current="page">{{ page.menu|trim }}</li>
+        </ol>
+    </nav>
+{% endif %}

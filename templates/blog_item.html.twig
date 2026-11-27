@@ -1,0 +1,158 @@
+{% extends 'partials/base.html.twig' %}
+
+{% block assets %}
+    {{ parent() }}
+    {% do assets.addJs('theme://js/article.js?v=2.3.0', {priority: 40, group: 'bottom', loading: 'defer'}) %}
+{% endblock %}
+
+{% block content %}
+    {% set author = denuo_author(page.header.author) %}
+    {% set article = page.content|render_components|denuo_outline(page) %}
+    {# "toc: false" in a page's front matter hides the table of contents; the body then centres. #}
+    {% set toc = page.header.toc is same as(false) ? [] : denuo_toc(article.headings|default([]), article.html) %}
+    {% set dates = denuo_dates(page) %}
+    {% set minutes = denuo_reading_time(page) %}
+    {% set excluded = theme_var('category_chip_exclude')|default([])|map(tag => tag|lower) %}
+    {% set topic = page.taxonomy.tag|default([])|filter(tag => tag|lower not in excluded and tag|lower != page.parent.menu|lower)|first %}
+
+    {# Hero: the article image with the tallest 16:7 crop, never upscaled. #}
+    {% set source = denuo_card_image(page, 16 / 7) %}
+    {% set hero = source.image|default(null) %}
+    {% set fallback = page.parent.header.design.image|default('') ?: denuo_brand().fallback_image %}
+    {% set all_widths = [640, 1000, 1500, 2000] %}
+    {% set widths = all_widths|filter(w => w <= source.max_width|default(0)) ?: [all_widths|first] %}
+    {% set base = 1500 in widths ? 1500 : widths|last %}
+    {% set hero_src = hero ? hero.cropZoom(base, (base * 7 / 16)|round).format('webp').url : fallback %}
+
+    {# TL;DR: a list in front matter, or one point per line. #}
+    {% set tldr = page.header.tldr|default([]) %}
+    {% set tldr = tldr is iterable ? tldr : tldr|split("\n") %}
+    {% set tldr = tldr|map(point => point|trim)|filter(point => point) %}
+
+    <article class="d2-article">
+        {% if hero_src %}
+        <div class="d2-wrap d2-article-hero">
+            <img src="{{ hero_src }}" width="{{ base }}" height="{{ (base * 7 / 16)|round }}" alt=""
+                 loading="eager" fetchpriority="high" decoding="async"
+                 {% if hero and widths|length > 1 %}
+                     srcset="{% for w in widths %}{{ hero.cropZoom(w, (w * 7 / 16)|round).format('webp').url }} {{ w }}w{{ not loop.last ? ', ' }}{% endfor %}"
+                     sizes="(min-width: 1276px) 1180px, calc(100vw - 32px)"
+                 {% endif %}{% if not hero %} data-image-fallback{% endif %}>
+        </div>
+        {% endif %}
+
+        <div class="d2-wrap d2-article-layout{{ toc ? ' has-toc' }}">
+            <header class="d2-article-head">
+                <span class="d2-tag">{{ page.parent.menu }}{% if topic %} · {{ topic }}{% endif %}</span>
+                <h1>{{ page.title|trim }}</h1>
+                <div class="d2-byline">
+                    {% set avatar = author.avatar ? denuo_avatar(author.avatar, 88) : null %}
+                    {% if avatar %}
+                        <img class="d2-byline-avatar" src="{{ avatar }}" width="44" height="44" alt="">
+                    {% elseif author.name %}
+                        <span class="d2-byline-avatar d2-initials" aria-hidden="true">{{ author.name|split(' ')|map(part => part|first)|join|slice(0, 2) }}</span>
+                    {% endif %}
+                    <p class="d2-meta">
+                        {% if author.name %}<span class="d2-byline-author">{{ author.name }}</span>{% if author.badge %} · {{ author.badge }}{% endif %} · {% endif %}
+                        <time class="dt-published" datetime="{{ page.date|date('c') }}">{{ denuo_date(page.date) }}</time>
+                        {%- if minutes %} · {{ minutes }}&nbsp;{{ 'THEME_DENUO2.CARD.READING'|t }}{% endif %}
+                        {% if page.header.verified %}
+                            <br>{{ 'THEME_DENUO2.ARTICLE.VERIFIED'|t }} <time datetime="{{ page.header.verified|date('Y-m-d') }}">{{ denuo_date(page.header.verified) }}</time>
+                        {% elseif dates.modified and dates.published and dates.modified - dates.published > 86400 %}
+                            <br>{{ 'THEME_DENUO2.ARTICLE.UPDATED'|t }} <time datetime="{{ dates.modified|date('c') }}">{{ denuo_date(dates.modified) }}</time>
+                        {% endif %}
+                    </p>
+                </div>
+            </header>
+            {% if toc %}
+                <aside class="d2-toc-column" id="toc">
+                    <details class="d2-toc">
+                        <summary>{{ 'THEME_DENUO2.ARTICLE.TOC'|t }}</summary>
+                        <nav id="article-toc" aria-label="{{ 'THEME_DENUO2.ARTICLE.TOC_LABEL'|t }}">
+                            <ul>
+                                {% for item in toc %}
+                                    <li><a href="#{{ item.id|url_encode }}">{{ item.label }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </nav>
+                    </details>
+                </aside>
+            {% else %}
+                <span id="toc"></span>
+            {% endif %}
+
+            <div class="d2-article-body">
+                {% if tldr|length %}
+                    <section class="d2-tldr" aria-labelledby="tldr-title">
+                        <h2 class="d2-tag d2-tag--solid" id="tldr-title">TL;DR</h2>
+                        <ul>
+                            {% for point in tldr %}<li>{{ point }}</li>{% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
+                <div id="article-content" class="article-content">
+                    {{ article.html|raw }}
+                </div>
+            </div>
+        </div>
+
+        {% set related = denuo_related(page, 3) %}
+        {% if related|length %}
+            <section class="d2-wrap d2-section" aria-labelledby="related-title">
+                <h2 class="d2-section-title" id="related-title">{{ 'THEME_DENUO2.ARTICLE.RELATED'|t }}</h2>
+                <ul class="d2-grid" role="list">
+                    {% for item in related %}
+                        <li>{% include 'partials/card.html.twig' with {page: item} only %}</li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
+
+        {% if author.name and (page.header.author_info ?? true) %}
+            {% set author_avatar = author.avatar ? denuo_avatar(author.avatar, 192) : null %}
+            <section class="d2-wrap d2-author" aria-labelledby="author-title">
+                <div class="d2-author-card">
+                    {% if author_avatar %}
+                        <img class="d2-author-avatar" src="{{ author_avatar }}" width="96" height="96" alt="" loading="lazy">
+                    {% else %}
+                        <span class="d2-author-avatar d2-initials" aria-hidden="true">{{ author.name|split(' ')|map(part => part|first)|join|slice(0, 2) }}</span>
+                    {% endif %}
+                    <div class="d2-author-text">
+                        <p class="d2-eyebrow">{{ 'THEME_DENUO2.ARTICLE.ABOUT_AUTHOR'|t }}</p>
+                        <h2 class="d2-author-name" id="author-title">{{ author.name }}</h2>
+                        {% if author.title %}<p class="d2-meta">{{ author.title|replace({' | ': ' · '}) }}</p>{% endif %}
+                        {% if author.bio %}<p class="d2-author-bio">{{ author.bio|split("\n")|first|trim }}</p>{% endif %}
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+
+        {% set adjacent = denuo_adjacent(page) %}
+        {% if adjacent.older or adjacent.newer %}
+            <nav class="d2-wrap d2-adjacent" aria-label="{{ 'THEME_DENUO2.ARTICLE.MORE_IN'|t(page.parent.menu) }}">
+                {% if adjacent.older %}
+                    <a class="d2-adjacent-link" rel="prev" href="{{ adjacent.older.url }}">
+                        <span class="d2-eyebrow"><span aria-hidden="true">←</span> {{ 'THEME_DENUO2.ARTICLE.OLDER'|t }}</span>
+                        <span class="d2-adjacent-title">{{ adjacent.older.title|trim }}</span>
+                    </a>
+                {% endif %}
+                {% if adjacent.newer %}
+                    <a class="d2-adjacent-link d2-adjacent-link--next" rel="next" href="{{ adjacent.newer.url }}">
+                        <span class="d2-eyebrow">{{ 'THEME_DENUO2.ARTICLE.NEWER'|t }} <span aria-hidden="true">→</span></span>
+                        <span class="d2-adjacent-title">{{ adjacent.newer.title|trim }}</span>
+                    </a>
+                {% endif %}
+            </nav>
+        {% endif %}
+
+        <dialog class="d2-lightbox" id="article-lightbox" aria-labelledby="article-lightbox-title">
+            <div class="d2-dialog-head">
+                <h2 class="d2-dialog-title" id="article-lightbox-title">{{ 'THEME_DENUO2.ARTICLE.IMAGE_PREVIEW'|t }}</h2>
+                <form method="dialog"><button class="d2-btn d2-btn--ghost d2-btn--icon" type="submit" aria-label="{{ 'THEME_DENUO2.ARTICLE.IMAGE_CLOSE'|t }}" autofocus>{% include 'partials/close-icon.html.twig' %}</button></form>
+            </div>
+            <img alt="">
+            <p class="d2-lightbox-error" hidden>{{ 'THEME_DENUO2.ARTICLE.IMAGE_ERROR'|t }}</p>
+        </dialog>
+    </article>
+
+{% endblock %}

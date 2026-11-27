@@ -1,0 +1,24 @@
+{#
+    Colour mode switcher: light · sunset · dark. A native radio group (Tab to enter, arrow keys to
+    move, announced as one choice) with a knob that slides to the checked option. js/mode.js
+    applies the choice, stores it in the denuo_mode cookie and keeps every switcher on the page in
+    sync. `id` must be unique per page (header and drawer each have one).
+#}
+{% set tokens = tokens|default(denuo_tokens()) %}
+{% set current = tokens.mode %}
+{% set modes = {
+    light: {label: 'THEME_DENUO2.MODE.LIGHT_LONG'|t},
+    sunset: {label: 'THEME_DENUO2.MODE.SUNSET_LONG'|t},
+    dark: {label: 'THEME_DENUO2.MODE.DARK_LONG'|t}
+} %}
+<fieldset class="d2-mode{{ variant|default('') ? ' d2-mode--' ~ variant }}" data-mode-switcher>
+    <legend class="visually-hidden">{{ 'THEME_DENUO2.MODE.LABEL'|t }}</legend>
+    <span class="d2-mode-knob" aria-hidden="true"></span>
+    {% for value, mode in modes %}
+        <label class="d2-mode-option d2-mode-option--{{ value }}">
+            <input class="visually-hidden" type="radio" name="{{ id }}" value="{{ value }}"{% if current == value %} checked{% endif %}>
+            {% include 'partials/mode-icon.html.twig' with {value: value} only %}
+            <span class="visually-hidden">{{ mode.label }}</span>
+        </label>
+    {% endfor %}
+</fieldset>

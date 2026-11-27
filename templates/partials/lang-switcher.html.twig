@@ -1,0 +1,48 @@
+{#
+    Language pill (header) or language list (drawer), built on the langswitcher plugin's own
+    logic template so URLs follow the plugin's settings (translated slugs, default-language
+    prefix, untranslated pages). Include only when the plugin is enabled and the site has more
+    than one language; navigation.html.twig checks that.
+    variant: 'header' (pill with a menu) or 'drawer' (plain list of links).
+#}
+{% extends 'partials/langswitcher-logic.html.twig' %}
+
+{% block language_block_start %}
+    {% if variant|default('header') == 'drawer' %}
+        <ul class="d2-lang-list" role="list">
+    {% else %}
+        <div class="d2-lang">
+            <button type="button" class="d2-nav-control d2-lang-toggle" data-submenu-toggle
+                    aria-expanded="false" aria-controls="lang-menu"
+                    aria-label="{{ 'THEME_DENUO2.NAV.LANGUAGE_CURRENT'|t(native_name(langswitcher.current)|capitalize) }}">
+                <span aria-hidden="true" translate="no">{{ langswitcher.current|upper }}</span>
+                <svg class="d2-nav-chevron" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M2 3.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <ul class="d2-lang-menu" id="lang-menu" role="list" hidden>
+    {% endif %}
+{% endblock %}
+
+{% block language_item %}
+    {% if show_language %}
+        {# The plugin's translated routes already carry the page extension (e.g. .html) and its
+           logic appends it again; drop the duplicate. #}
+        {% set ext = page.urlExtension %}
+        {% set href = (ext and lang_url ends with ext ~ ext) ? lang_url|slice(0, lang_url|length - ext|length) : lang_url %}
+        <li>
+            <a class="d2-lang-link" href="{{ href ~ uri.params ~ (uri.query|length > 1 ? '?' ~ uri.query) }}"
+               hreflang="{{ language }}" lang="{{ language }}"{% if language == langswitcher.current %} aria-current="true"{% endif %}>
+                <span class="d2-lang-code" aria-hidden="true" translate="no">{{ language|upper }}</span>
+                <span translate="no">{{ native_name(language)|capitalize }}</span>
+            </a>
+        </li>
+    {% endif %}
+{% endblock %}
+
+{% block language_block_end %}
+    {% if variant|default('header') == 'drawer' %}
+        </ul>
+    {% else %}
+            </ul>
+        </div>
+    {% endif %}
+{% endblock %}

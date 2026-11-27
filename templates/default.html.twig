@@ -1,0 +1,10 @@
+{% extends 'partials/base.html.twig' %}
+
+{% block content %}
+    <div class="d2-wrap d2-prose">
+        {% if page.header.title and '<h1' not in page.content %}<h1>{{ page.title|trim }}</h1>{% endif %}
+        <div id="article-content" class="article-content">
+            {{ page.content|raw }}
+        </div>
+    </div>
+{% endblock %}

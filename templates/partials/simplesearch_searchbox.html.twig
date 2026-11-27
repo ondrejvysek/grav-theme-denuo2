@@ -1,0 +1,9 @@
+{% set field_id = field_id|default('site-query') %}
+{% set large = size|default('') == 'lg' %}
+<form class="d2-search-form{{ large ? ' d2-search-form--lg' }}" role="search" method="get" action="{{ url('/search') }}">
+    <label class="visually-hidden" for="{{ field_id }}">{{ 'THEME_DENUO2.SEARCH.FIELD'|t }}</label>
+    <input class="d2-input" type="search" id="{{ field_id }}" name="query" value="{{ query }}"
+           placeholder="{{ 'THEME_DENUO2.SEARCH.PLACEHOLDER'|t }}" minlength="3" maxlength="160" required
+           autocomplete="off" spellcheck="false" enterkeyhint="search"{% if autofocus|default(false) %} autofocus{% endif %}>
+    <button class="d2-btn{{ large ? ' d2-btn--lg' }}" type="submit">{{ 'THEME_DENUO2.SEARCH.SUBMIT'|t }}</button>
+</form>

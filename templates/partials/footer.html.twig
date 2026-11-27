@@ -1,0 +1,34 @@
+{% set footer = denuo_footer() %}
+<footer class="d2-footer">
+    <div class="d2-wrap d2-footer-grid">
+        <div class="d2-footer-brand">
+            <a class="d2-footer-logo" href="{{ url('/') }}">
+                {% include 'partials/brand-mark.html.twig' with {size: 32} %}
+                <span translate="no">{{ denuo_brand().name }}</span>
+            </a>
+            {% if footer.tagline %}<p>{{ footer.tagline }}</p>{% endif %}
+        </div>
+        {% for column in footer.columns|default([]) %}
+            {% set links = column.links|default([])|filter(link => link.label|trim and link.url|trim) %}
+            {% if links|length %}
+                <nav class="d2-footer-column" aria-labelledby="footer-column-{{ loop.index }}">
+                    <h2 class="d2-footer-title" id="footer-column-{{ loop.index }}">{{ column.title }}</h2>
+                    <ul>
+                        {% for link in links %}
+                            <li><a href="{{ denuo_link(link.url) }}">{{ link.label|trim }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="d2-wrap d2-footer-copy">
+        {% set year = 'now'|date('Y') %}
+        {% set start = theme_var('copy_startyear')|trim %}
+        <span>© {{ start and start != year ? start ~ ' – ' }}{{ year }} <span translate="no">{{ theme_var('copy_company') ?: denuo_brand().name }}</span></span>
+        {% set privacy = denuo_privacy() %}
+        {% if privacy.banner %}
+            <button type="button" class="d2-footer-consent" data-consent-open aria-controls="d2-consent">{{ privacy.settings }}</button>
+        {% endif %}
+    </div>
+</footer>

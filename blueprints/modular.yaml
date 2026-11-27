@@ -1,0 +1,53 @@
+title: 'Modular page'
+'@extends':
+    type: modular
+    context: blueprints://pages
+
+form:
+  fields:
+    tabs:
+      fields:
+        hero:
+          type: tab
+          title: Hero
+          fields:
+            hero_intro:
+              type: display
+              size: large
+              markdown: true
+              content: 'Used on the home page when **Theme hero on the home page** is on in the theme settings. Each language version of this page has its own texts.'
+            header.hero.tag:
+              type: text
+              label: Tag above the heading
+            header.hero.title:
+              type: text
+              label: Heading (H1)
+              help: 'Empty: the site name.'
+              size: long
+            header.hero.lead:
+              type: textarea
+              label: One sentence under the heading
+              rows: 2
+            header.hero.primary.label:
+              type: text
+              label: Primary button – text
+              help: 'Empty: the translation of "Latest articles".'
+            header.hero.primary.url:
+              type: text
+              label: Primary button – link
+              help: 'An anchor such as #clanky, a page route such as /blog, or a full address. Empty link: no button.'
+            header.hero.secondary.label:
+              type: text
+              label: Secondary button – text
+            header.hero.secondary.url:
+              type: text
+              label: Secondary button – link
+            header.hero.image:
+              type: text
+              label: Image
+              help: 'Path under /user/images. Shown at most at its own size, so use at least 1200px wide for sharp screens.'
+              size: long
+            header.hero.image_alt:
+              type: text
+              label: Image description (alt)
+              help: 'Leave empty if the image is only decorative.'
